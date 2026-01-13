@@ -1,0 +1,82 @@
+# =============================================================================
+# Docker Compose for microWakeWord Training
+# For training custom wake words for HAVoice PE
+# =============================================================================
+#
+# Usage:
+#   docker-compose up
+#
+# Then open: http://localhost:8888
+#
+# For GPU acceleration (NVIDIA):
+#   docker-compose -f docker-compose.yaml -f docker-compose.gpu.yaml up
+#
+
+version: '3.8'
+
+services:
+  microwakeword-trainer:
+    container_name: microwakeword-trainer
+    image: ghcr.io/futureproofhomes/microwakeword:latest
+
+    # Alternative images if the above doesn't work:
+    # image: ghcr.io/tatertotterson/microwakeword:latest
+    # image: python:3.10-slim  # Build from scratch
+
+    ports:
+      - "8888:8888"   # Jupyter Notebook
+
+    volumes:
+      # Mount training workspace
+      - ./:/workspace
+
+      # Mount models output
+      - ./models:/workspace/models
+
+      # Mount samples
+      - ./samples:/workspace/samples
+
+      # Mount notebooks
+      - ./notebooks:/workspace/notebooks
+
+      # Mount config
+      - ./config:/workspace/config
+
+    working_dir: /workspace
+
+    environment:
+      - JUPYTER_TOKEN=microwakeword
+      - TF_CPP_MIN_LOG_LEVEL=2
+
+    command: >
+      jupyter notebook
+      --ip=0.0.0.0
+      --port=8888
+      --allow-root
+      --no-browser
+      --NotebookApp.token='microwakeword'
+
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+        reservations:
+          memory: 4G
+
+    restart: unless-stopped
+
+# GPU support (uncomment if you have NVIDIA GPU)
+# Add this to use: docker-compose -f docker-compose.yaml up
+#
+#  microwakeword-trainer-gpu:
+#    extends:
+#      service: microwakeword-trainer
+#    container_name: microwakeword-trainer-gpu
+#    deploy:
+#      resources:
+#        reservations:
+#          devices:
+#            - driver: nvidia
+#              count: all
+#              capabilities: [gpu]

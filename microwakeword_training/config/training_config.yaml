@@ -1,0 +1,151 @@
+# =============================================================================
+# microWakeWord Training Configuration
+# Customize these settings for your wake word training
+# =============================================================================
+
+# Wake Word Settings
+wake_word:
+  # The wake word phrase to train (use underscores for spaces)
+  phrase: "hey_freya"
+
+  # Display name for the wake word
+  display_name: "Hey Freya"
+
+  # Phonetic spelling for TTS synthesis
+  # "Hey Freya" sounds like "hey fray uh" (3 syllables)
+  phonetic: "hey fray uh"
+
+  # Alternative spellings for synthesis variety
+  # These help the model learn pronunciation variations
+  spelling_variants:
+    - "hey freya"
+    - "hey fray uh"
+    - "hey fraya"
+    - "hey frayah"
+
+  # Preset based on wake word length:
+  # - "short" for 1-2 syllable words
+  # - "medium" for 3-4 syllable phrases (recommended for most)
+  # - "long" for 5+ syllable phrases
+  preset: "medium"
+
+# Sample Generation
+samples:
+  # Number of synthetic samples to generate
+  # More samples = better accuracy but longer training time
+  # Recommended: 5000-20000 for good results
+  synthetic_count: 10000
+
+  # Whether to use personal voice samples (if available)
+  use_personal_samples: true
+
+  # Path to personal voice samples (relative to training directory)
+  personal_samples_dir: "samples/personal"
+
+# Audio Augmentation
+augmentation:
+  # Level of audio augmentation during training
+  # Options: "light", "medium", "heavy"
+  # Heavy augmentation helps with noise robustness
+  level: "medium"
+
+  # Add background noise augmentation
+  add_noise: true
+
+  # Add reverb/room simulation
+  add_reverb: true
+
+  # Add speed variations
+  add_speed_variation: true
+
+# Model Architecture
+model:
+  # Model size/complexity
+  # Options: "small", "medium", "large"
+  # Larger = more accurate but more memory/compute
+  size: "medium"
+
+  # Quantization for deployment
+  quantize: true
+
+  # Target platform
+  # Options: "esp32", "esp32s3", "generic"
+  target_platform: "esp32s3"
+
+# Training Parameters
+training:
+  # Number of training epochs
+  epochs: 100
+
+  # Batch size (reduce if running out of memory)
+  batch_size: 64
+
+  # Learning rate
+  learning_rate: 0.001
+
+  # Early stopping patience
+  early_stopping_patience: 10
+
+  # Validation split ratio
+  validation_split: 0.2
+
+# Detection Thresholds
+detection:
+  # Probability cutoff for wake word detection
+  # Lower = more sensitive, Higher = fewer false positives
+  # Range: 0.5 - 0.95
+  probability_cutoff: 0.85
+
+  # Sliding window size for detection stability
+  # Larger = more stable but slower response
+  sliding_window_size: 5
+
+# Output Settings
+output:
+  # Output directory for trained models
+  model_dir: "models"
+
+  # Generate ESPHome-compatible config
+  generate_esphome_config: true
+
+  # Export formats
+  export_tflite: true
+  export_json_manifest: true
+
+# Voice Synthesis (Piper TTS)
+synthesis:
+  # Piper voice model for generating synthetic samples
+  # Recommend using multiple voices for variety
+  voices:
+    - "en_US-lessac-medium"
+    - "en_US-amy-medium"
+    - "en_US-ryan-medium"
+
+  # Speed variations for sample generation
+  speed_range: [0.85, 1.15]
+
+  # Pitch variations
+  pitch_range: [-0.1, 0.1]
+
+# Negative Samples
+negatives:
+  # Use pre-generated negative samples from HuggingFace
+  use_pretrained_negatives: true
+
+  # Additional negative phrases to generate
+  # (words that sound similar to "hey fray uh" but shouldn't trigger)
+  similar_phrases:
+    - "hey freighter"
+    - "hey frank"
+    - "hey fray"
+    - "a fray"
+    - "hey prayer"
+    - "play a"
+    - "hey gray"
+    - "hey trade"
+    - "play music"
+    - "hey google"
+    - "hey siri"
+    - "hey alexa"
+    - "okay freya"
+    - "say freya"
