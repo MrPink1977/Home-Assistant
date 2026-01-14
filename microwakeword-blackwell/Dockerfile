@@ -22,11 +22,12 @@ ENV TZ=UTC
 # System Dependencies
 # ==============================================================================
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    # Python
-    python3.11 \
-    python3.11-venv \
-    python3.11-dev \
+    # Python (Ubuntu 24.04 uses Python 3.12)
+    python3 \
+    python3-venv \
+    python3-dev \
     python3-pip \
+    python3-full \
     # Audio processing
     ffmpeg \
     libportaudio2 \
@@ -47,9 +48,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
 
-# Set Python 3.11 as default
-RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.11 1 \
-    && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1
+# Set up Python aliases
+RUN ln -sf /usr/bin/python3 /usr/bin/python
 
 # ==============================================================================
 # CUDA Environment Variables for Blackwell
@@ -67,14 +67,15 @@ ENV XLA_FLAGS=--xla_gpu_cuda_data_dir=/usr/local/cuda
 # ==============================================================================
 # Python Dependencies
 # ==============================================================================
-RUN pip install --upgrade pip setuptools wheel
+# Note: Using --break-system-packages for Docker container (safe in isolated environment)
+RUN pip install --break-system-packages --upgrade pip setuptools wheel
 
 # Install TensorFlow with CUDA support
 # Note: For Blackwell, first-run operations will JIT compile (~30s one-time delay)
-RUN pip install tensorflow[and-cuda]==2.18.0
+RUN pip install --break-system-packages "tensorflow[and-cuda]==2.18.0"
 
 # Install microWakeWord dependencies
-RUN pip install \
+RUN pip install --break-system-packages \
     audiomentations \
     datasets \
     mmap_ninja \
@@ -89,11 +90,11 @@ RUN pip install \
     pandas
 
 # Install special forks with fixes
-RUN pip install 'git+https://github.com/puddly/pymicro-features@puddly/minimum-cpp-version'
-RUN pip install 'git+https://github.com/whatsnowplaying/audio-metadata@d4ebb238e6a401bb1a5aaaac60c9e2b3cb30929f'
+RUN pip install --break-system-packages 'git+https://github.com/puddly/pymicro-features@puddly/minimum-cpp-version'
+RUN pip install --break-system-packages 'git+https://github.com/whatsnowplaying/audio-metadata@d4ebb238e6a401bb1a5aaaac60c9e2b3cb30929f'
 
 # Install Jupyter for notebook interface
-RUN pip install \
+RUN pip install --break-system-packages \
     jupyter \
     jupyterlab \
     ipywidgets \
@@ -102,7 +103,7 @@ RUN pip install \
 # Install microWakeWord from source
 RUN git clone https://github.com/kahrendt/microWakeWord.git /opt/microWakeWord \
     && cd /opt/microWakeWord \
-    && pip install -e .
+    && pip install --break-system-packages -e .
 
 # ==============================================================================
 # Workspace Setup
