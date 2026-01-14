@@ -69,9 +69,9 @@ ENV XLA_FLAGS=--xla_gpu_cuda_data_dir=/usr/local/cuda
 # ==============================================================================
 # Skip upgrading pip/setuptools/wheel - use system versions (they work fine)
 
-# Install TensorFlow with CUDA support
+# Install TensorFlow NIGHTLY with CUDA support (better Blackwell JIT support)
 # Note: For Blackwell, first-run operations will JIT compile (~30s one-time delay)
-RUN pip install --break-system-packages "tensorflow[and-cuda]==2.18.0"
+RUN pip install --break-system-packages tf-nightly[and-cuda]
 
 # Install microWakeWord dependencies
 RUN pip install --break-system-packages \
