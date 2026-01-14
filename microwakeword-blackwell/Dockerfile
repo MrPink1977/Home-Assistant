@@ -109,12 +109,13 @@ RUN git clone https://github.com/kahrendt/microWakeWord.git /opt/microWakeWord \
 # ==============================================================================
 WORKDIR /data
 
-# Copy startup script
+# Copy startup script and fix line endings (Windows CRLF -> Unix LF)
 COPY startup.sh /startup.sh
-RUN chmod +x /startup.sh
+RUN sed -i 's/\r$//' /startup.sh && chmod +x /startup.sh
 
-# Copy GPU test script
+# Copy GPU test script and fix line endings
 COPY test_gpu.py /test_gpu.py
+RUN sed -i 's/\r$//' /test_gpu.py
 
 # Expose Jupyter port
 EXPOSE 8888
