@@ -585,6 +585,58 @@ This guide covers common issues with the Freya Home Assistant setup and their so
    watch -n 1 free -h
    ```
 
+### RTX 50 Series (Blackwell) GPU Compatibility
+
+**Symptoms:**
+- Training fails with `CUDA_ERROR_INVALID_HANDLE`
+- Warnings about compute capability 12.0
+- Error: `TensorFlow was not built with CUDA kernel binaries compatible with compute capability 12.0`
+- GPU: RTX 5060 Ti, 5070, 5080, or 5090
+
+**Cause:** RTX 50 series GPUs use compute capability 12.0 (Blackwell architecture). The TensorFlow/CUDA stack in the microWakeWord training container doesn't have pre-compiled kernels for this new architecture yet.
+
+**Solution - Use CPU Training:**
+```bash
+# Set environment variable to disable GPU
+CUDA_VISIBLE_DEVICES='' python -m microwakeword.model_train_eval ...
+```
+
+**Note:** The following warnings are NORMAL when using CPU mode and can be safely ignored:
+```
+Unable to register cuFFT/cuDNN/cuBLAS factory...
+CUDA_ERROR_NO_DEVICE: no CUDA-capable device is detected
+```
+
+**CPU Training Optimization Tips:**
+
+1. **Set threading before TensorFlow import:**
+   ```python
+   import os
+   os.environ['CUDA_VISIBLE_DEVICES'] = ''
+   os.environ['OMP_NUM_THREADS'] = '6'  # Your physical CPU cores
+   os.environ['TF_NUM_INTRAOP_THREADS'] = '6'
+   os.environ['TF_NUM_INTEROP_THREADS'] = '2'
+   os.environ['TF_ENABLE_ONEDNN_OPTS'] = '1'  # Intel optimizations
+   ```
+
+2. **Increase batch size for CPU efficiency:**
+   ```python
+   BATCH_SIZE = 256  # Up from 100, better CPU cache utilization
+   ```
+
+3. **Reduce samples for faster iteration:**
+   ```python
+   MAX_SAMPLES = 15000  # Start smaller, increase if quality is low
+   ```
+
+4. **Use data pipeline optimizations:**
+   ```python
+   dataset = dataset.batch(256)
+   dataset = dataset.prefetch(tf.data.AUTOTUNE)
+   ```
+
+**Expected CPU training time:** 3-6 hours on modern 6-core CPU
+
 ### Sample Generation Fails
 
 **Symptoms:**
