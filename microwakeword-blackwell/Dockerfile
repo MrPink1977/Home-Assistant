@@ -67,8 +67,8 @@ ENV XLA_FLAGS=--xla_gpu_cuda_data_dir=/usr/local/cuda
 # ==============================================================================
 # Python Dependencies
 # ==============================================================================
-# Note: Using --break-system-packages for Docker container (safe in isolated environment)
-RUN pip install --break-system-packages --upgrade pip setuptools wheel
+# Note: Using --break-system-packages and --ignore-installed for Docker container
+RUN pip install --break-system-packages --ignore-installed --upgrade pip setuptools wheel
 
 # Install TensorFlow with CUDA support
 # Note: For Blackwell, first-run operations will JIT compile (~30s one-time delay)
