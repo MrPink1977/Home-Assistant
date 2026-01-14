@@ -3,8 +3,6 @@
 # microWakeWord Blackwell Container Startup Script
 # ==============================================================================
 
-set -e
-
 echo "=============================================="
 echo " microWakeWord Training Environment"
 echo " Blackwell GPU Compatible (RTX 50 Series)"
@@ -21,10 +19,10 @@ else
     GPU_DETECTED=false
 fi
 
-# Test TensorFlow GPU access
+# Test TensorFlow GPU access (don't exit on failure)
 echo ""
 echo "Testing TensorFlow GPU access..."
-python3 /test_gpu.py
+python3 /test_gpu.py || echo "GPU test completed (see above for results)"
 
 # Copy training notebook if not present
 if [ ! -f /data/microWakeWord_training_notebook.ipynb ]; then
